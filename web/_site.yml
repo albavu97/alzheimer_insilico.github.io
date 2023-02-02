@@ -6,7 +6,7 @@ navbar:
       href: index.html
     - text: "Datos"
       href: about.html
-output_dir: "."
+output_dir: "site"
 output:
   BiocStyle::html_document:
     fig_caption: yes

@@ -8,3 +8,43 @@ date: "Febrero 2022"
 En este apartado lo que se va a intentar es explicar qué datos se han usado en el estudio y cuál ha sido el motivo de usar esos datos. También se mostrará algo de código y se verá un primer análisis exploratorio de los datos.
 
 ----
+
+## Análisis previo de los datos GSE138261
+
+```{r setup, include=FALSE}
+doAll = TRUE
+knitr::opts_chunk$set(echo = TRUE)  
+library(knitr)
+# Set so that long lines in R will be wrapped:
+opts_chunk$set(tidy.opts=list(width.cutoff=40),tidy=TRUE)
+```
+
+```{r, eval = doAll, fig.width=4, fig.height=4, results='hide'}
+library(GEOquery)
+my_id <- "GSE138261"
+##Solo se coge la primera plataforma
+gse138261_raw <- getGEO(my_id)[[1]]
+
+length(gse138261_raw)
+```
+
+```{r, eval = doAll, fig.width=4, fig.height=4}
+exprs(gse138261_raw) <- log2(exprs(gse138261_raw))
+boxplot(exprs(gse138261_raw),outline=FALSE)
+```
+
+```{r, eval = doAll, fig.width=4, fig.height=4}
+library(dplyr)
+
+sampleInfo <- pData(gse138261_raw)
+sampleInfo
+
+#Se seleccionan dos columnas
+
+sampleInfo <- select(sampleInfo, "age:ch1","disease state:ch1","gender:ch1")
+
+## Optionally, rename to more convenient column names
+sampleInfo <- rename(sampleInfo,age = "age:ch1", disease_state="disease state:ch1",gender="gender:ch1")
+corMatrix <- cor(exprs(gse),use="c")
+pheatmap(corMatrix)   
+```
