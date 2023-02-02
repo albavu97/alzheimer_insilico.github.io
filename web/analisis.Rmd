@@ -1,0 +1,21 @@
+---
+title: "Datos del estudio"
+author: "Alba Vallejo Urruchi"
+subtitle: "Universidad de Valencia"
+---
+
+# Expresión diferencial
+
+Uno de los paquetes principales de expresión diferencial es `limma`, que además de verlo en esta asignatura también se usó el cuatrimestre pasado en la asignatura de **Bioinformática estadística**. Para poder hacer este análisi hay que crear un `model.matrix`que es una matriz con el diseño del modelo, es decir, dependiendo de las variables que se quieran tener en cuenta, por cada muestra se pone 0 que significa que la fila (muestra) pertenece al grupo/variable (columna).
+
+En nuestro caso se elaborará un `model.matrix` con casos(AD) y controles para luego aplicar el análisis diferencial.
+
+```{r, eval = doAll, fig.width=8, fig.height=6,warning=FALSE}
+library(limma)
+design <- model.matrix(~0+sampleInfo$disease_state)
+design
+## the column names are a bit ugly, so we will rename
+colnames(design) <- c("AD","Control")
+
+summary(exprs(gse138261_raw))
+```

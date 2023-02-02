@@ -1,6 +1,7 @@
 ---
 title: "Introducción"
-date: "Febrero 2022"
+author: "Alba Vallejo Urruchi"
+subtitle: "Universidad de Valencia"
 ---
 <br>
 

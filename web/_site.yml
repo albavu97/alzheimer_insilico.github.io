@@ -6,6 +6,8 @@ navbar:
       href: index.html
     - text: "Datos"
       href: about.html
+    - text: "Análisis"
+      href: analisis.html
 output_dir: "site"
 output:
   BiocStyle::html_document:

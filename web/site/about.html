@@ -9,7 +9,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Alba Vallejo Urruchi" />
 
+<meta name="date" content="2023-02-02" />
 
 <title>Datos del estudio</title>
 
@@ -326,6 +328,9 @@ function toggle_visibility(id1) {
 <li>
   <a href="about.html">Datos</a>
 </li>
+<li>
+  <a href="analisis.html">Análisis</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         
@@ -339,7 +344,9 @@ function toggle_visibility(id1) {
 
 
 <h1 class="title toc-ignore">Datos del estudio</h1>
-<h4 class="date">Febrero 2022</h4>
+<h3 class="subtitle">Universidad de Valencia</h3>
+<p class="author-name">Alba Vallejo Urruchi</p>
+<h4 class="date">2 February 2023</h4>
 
 </div>
 
@@ -347,83 +354,79 @@ function toggle_visibility(id1) {
 <p><br></p>
 <p>En este apartado lo que se va a intentar es explicar qué datos se han usado en el estudio y cuál ha sido el motivo de usar esos datos. También se mostrará algo de código y se verá un primer análisis exploratorio de los datos.</p>
 <hr />
-<div id="análisis-previo-de-los-datos-gse138261" class="section level2">
-<h2>Análisis previo de los datos GSE138261</h2>
+<div id="elección-de-datos" class="section level1">
+<h1>Elección de datos</h1>
+<p>Esta parte creo que no ha sido la más acertada por mi parte debido a mi poca experiencia todavía en el mundo de la bioinformática. Entonces en un principio entontré dos posibles fuentes de datos:</p>
+<ul>
+<li><p>(GSE138214)[<a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE138214" class="uri">https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE138214</a>]</p></li>
+<li><p>(GSE138261)[<a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi" class="uri">https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi</a>]</p></li>
+</ul>
+<p><strong>¿Por qué elegí estos dos estudios?</strong>Porque son estudios que contienen arrays de Affymetrix de la expresión del genoma humano. El problema fue que ambos tenían datos mezclados, es decir que algunas de las muestras eran las mismas. En un primer momento se intentó combinar ambos experimentos, pero aquí surgió el siguiente problema y es <strong>¿cómo puedo combinar muestras de diferentes plataformas?</strong> Después de investigar cómo lo podía hacer, ví que había un montón de problemas luego en los análisis de expresión diferencial (objetivo del trabjo), así que finalmente y lamentando tener que acotar el scope del trabajo se optó por usar <strong>GSE138261</strong> con las muestras de la primera plataforma.</p>
+<p>Características de la matriz de expresión con la que se realizará el estudio:</p>
+<div class='horizontal-scroll'><table>
+<tbody>
+<tr class="odd">
+<td>Control</td>
+<td>19</td>
+</tr>
+<tr class="even">
+<td>AD</td>
+<td>17</td>
+</tr>
+<tr class="odd">
+<td>man</td>
+<td>16</td>
+</tr>
+<tr class="even">
+<td>woman</td>
+<td>19</td>
+</tr>
+<tr class="odd">
+<td>NA</td>
+<td>1</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div id="análisis-exploratorio" class="section level1">
+<h1>Análisis exploratorio</h1>
+<p>En este apartado lo que se va hacer es intentar generar algún tipo de gráfico para poder poder ver algún tipo de patrón (si fuera posible).</p>
 <pre class="r"><code>library(GEOquery)
-my_id &lt;- &quot;GSE138261&quot;
-gse138261_raw &lt;- getGEO(my_id)</code></pre>
-<pre><code>## Found 15 file(s)</code></pre>
-<pre><code>## GSE138261-GPL27556_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version: /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GSE138261-GPL27556_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version of GPL27556 found here:
-## /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GPL27556.soft.gz</code></pre>
-<pre><code>## GSE138261-GPL6156_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version: /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GSE138261-GPL6156_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version of GPL6156 found here:
-## /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GPL6156.soft.gz</code></pre>
-<pre><code>## GSE138261-GPL6157_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version: /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GSE138261-GPL6157_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version of GPL6157 found here:
-## /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GPL6157.soft.gz</code></pre>
-<pre><code>## GSE138261-GPL6158_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version: /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GSE138261-GPL6158_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version of GPL6158 found here:
-## /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GPL6158.soft.gz</code></pre>
-<pre><code>## GSE138261-GPL6159_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version: /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GSE138261-GPL6159_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version of GPL6159 found here:
-## /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GPL6159.soft.gz</code></pre>
-<pre><code>## GSE138261-GPL6160_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version: /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GSE138261-GPL6160_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version of GPL6160 found here:
-## /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GPL6160.soft.gz</code></pre>
-<pre><code>## GSE138261-GPL6161_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version: /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GSE138261-GPL6161_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version of GPL6161 found here:
-## /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GPL6161.soft.gz</code></pre>
-<pre><code>## GSE138261-GPL6162_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version: /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GSE138261-GPL6162_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version of GPL6162 found here:
-## /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GPL6162.soft.gz</code></pre>
-<pre><code>## GSE138261-GPL6163_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version: /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GSE138261-GPL6163_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version of GPL6163 found here:
-## /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GPL6163.soft.gz</code></pre>
-<pre><code>## GSE138261-GPL6164_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version: /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GSE138261-GPL6164_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version of GPL6164 found here:
-## /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GPL6164.soft.gz</code></pre>
-<pre><code>## GSE138261-GPL6165_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version: /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GSE138261-GPL6165_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version of GPL6165 found here:
-## /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GPL6165.soft.gz</code></pre>
-<pre><code>## GSE138261-GPL6166_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version: /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GSE138261-GPL6166_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version of GPL6166 found here:
-## /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GPL6166.soft.gz</code></pre>
-<pre><code>## GSE138261-GPL6167_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version: /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GSE138261-GPL6167_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version of GPL6167 found here:
-## /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GPL6167.soft.gz</code></pre>
-<pre><code>## GSE138261-GPL6168_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version: /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GSE138261-GPL6168_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version of GPL6168 found here:
-## /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GPL6168.soft.gz</code></pre>
-<pre><code>## GSE138261-GPL6169_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version: /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GSE138261-GPL6169_series_matrix.txt.gz</code></pre>
-<pre><code>## Using locally cached version of GPL6169 found here:
-## /var/folders/9x/_6c57s054bx7l0gf9qmk5qwr0000gn/T//Rtmp79oHaF/GPL6169.soft.gz</code></pre>
-<pre class="r"><code>length(gse138261_raw)</code></pre>
-<pre><code>## [1] 15</code></pre>
-<pre class="r"><code># pData(gse138261_raw) ## print the
-# sample information
-# fData(gse138261_raw) ## print the
-# gene annotation exprs(gse138261_raw)
-# ## print the expression data</code></pre>
-<pre class="r"><code>save(gse, file = paste0(&quot;tmp/&quot;, &quot;gse138261_raw.rda&quot;))</code></pre>
-<pre class="r"><code>exprs(gse) &lt;- log2(exprs(gse))
-boxplot(exprs(gse), outline = FALSE)</code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-17-1.png" width="100%" /></p>
+id_gse &lt;- &quot;GSE138261&quot;
+gse138261_raw &lt;- getGEO(id_gse)[[1]]
+length(gse138261_raw)</code></pre>
+<p>Una vez que ya hemos extraído de GEO los archivos del “Expression Set”, lo que vemos es que los valores de expresión son altos. Para poder trabajar mejor se aplica el logaritmo base 2 y representamos el resultado con un .</p>
+<pre class="r"><code>exprs(gse138261_raw) &lt;- log2(exprs(gse138261_raw))
+boxplot(exprs(gse138261_raw), outline = FALSE)</code></pre>
+<p><img src="about_files/figure-html/unnamed-chunk-2-1.png" width="100%" /></p>
+<p>Ahora vamos a ver un mapa de calor, en el que se ve la interacción entre las distintas muestras, contra más cercanas a 0, el valor es menos representativo, es decir, esas muestras tienen menos que ver.</p>
+<pre class="r"><code>library(dplyr)
+
+sampleInfo &lt;- pData(gse138261_raw)
+
+sampleInfo &lt;- select(sampleInfo, &quot;age:ch1&quot;,
+    &quot;disease state:ch1&quot;, &quot;gender:ch1&quot;)
+sampleInfo &lt;- rename(sampleInfo, age = &quot;age:ch1&quot;,
+    disease_state = &quot;disease state:ch1&quot;,
+    gender = &quot;gender:ch1&quot;)
+corMatrix &lt;- cor(exprs(gse138261_raw), use = &quot;c&quot;)
+pheatmap(corMatrix)</code></pre>
+<p><img src="about_files/figure-html/unnamed-chunk-3-1.png" width="100%" /></p>
+<p>El mismo mapa de calor pero con más información también de las variables de edad, género y viendo cuáles pertenecen a Alzheimer (AD) y al control.</p>
+<pre class="r"><code>rownames(sampleInfo) &lt;- colnames(corMatrix)
+pheatmap(corMatrix, annotation_col = sampleInfo)</code></pre>
+<p><img src="about_files/figure-html/unnamed-chunk-4-1.png" width="100%" /></p>
+<p>El último gráfico ha sido un poco de investigación propio y ver cómo se puede hacer, se calcula pca (principal components analysis) y se van a agrupar viendo cómo de separadas están los AD de los control y también de cada muestra se ve la edad del paciente.</p>
+<pre class="r"><code>library(ggplot2)
+library(ggrepel)
+
+pca &lt;- prcomp(t(exprs(gse138261_raw)))
+
+cbind(sampleInfo, pca$x) %&gt;%
+    ggplot(aes(x = PC1, y = PC2, col = disease_state,
+        label = paste(&quot;Age&quot;, age))) + geom_point() +
+    geom_text_repel()</code></pre>
+<p><img src="about_files/figure-html/unnamed-chunk-5-1.png" width="100%" /></p>
 </div>
 
 
