@@ -1,0 +1,10 @@
+---
+title: "Datos del estudio"
+date: "Febrero 2022"
+---
+
+<br>
+
+En este apartado lo que se va a intentar es explicar qué datos se han usado en el estudio y cuál ha sido el motivo de usar esos datos. También se mostrará algo de código y se verá un primer análisis exploratorio de los datos.
+
+----

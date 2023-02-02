@@ -1,0 +1,43 @@
+---
+title: "Introducción"
+date: "Febrero 2022"
+---
+<br>
+
+Este es el trabajo final de la asignatura de estudios in silico en biomedicina. Y lo primero, algo que hemos estado haciendo a lo largo de todas las clases es ir simulando mediante el ordenador procesos/análisis biológicos y es que esa es la definición de **estudios in silico**: rama de la biología computacional cuyo objetivo es explorar y experimentar con procesos biológicos de simulaciones hechas por ordenador. 
+
+----
+
+## Objetivos
+
+<br>
+
+El objetivo de este trabajo era poder hacer algún tipo de estudio in silico relacionado con la biomedicina. Y después de encontrar una temática que fue presentada en un resumen en noviembre, se iría haciendo un estudio a través de scripts de R. A lo largo del trabajo se han ido teniendo una serie de incovenientes que también se irán comentando porque así tan importante es el resultado como el aprendizaje en el proceso realizado.
+
+<br>
+
+## Descripción del estudio
+
+<br>
+
+El alzheimer está considerado como una de las enfermedades más acuciantes del siglo XXI,
+pero debido a la complejidad del estudio del cerebro y las enfermedades neurodegenerativas
+existen todavía muchas preguntas que resolver. Una vez definido los objetivos más concretos
+de lo que en principio se quiere estudiar se hará un estudio del estado del arte sobre la
+situación actual en este tipo de proyectos a nivel de bioinformática.
+Se propone intentar realizar un análisis de enriquecimiento funcional basado en estudio del
+genoma del cerebro, considerando diferentes grupos de estudio, caso como control.
+
+<br>
+
+## Motivación 
+
+La enfermedad de Alzheimer es responsable de entre un 60 y un 80 por ciento de los casos de demencia. El Alzheimer no es una característica normal del envejecimiento. El factor de riesgo conocido más importante es el aumento de la edad, y la mayoría de las personas con Alzheimer son mayores de 65 años.
+
+El Alzheimer empeora con el tiempo. El Alzheimer es una enfermedad progresiva, en la que los síntomas de demencia empeoran gradualmente con el paso de los años. En sus primeras etapas, la pérdida de memoria es leve, pero en la etapa final del Alzheimer, las personas pierden la capacidad de mantener una conversación y responder al entorno.Unas 800.000 personas padecen actualmente Alzheimer en España.Cada año se diagnostican en España unos 40.000 nuevos casos de esta enfermedad.Se estima que 2050, el número de pacientes ascenderá hasta los casi dos millones de personas en España. Más del 50% de los casos que aún son leves, están todavía sin diagnosticar.
+
+En la siguiente web que es la asociación mundial del alzheimer se muestra muy bien (de forma didáctica) algunos de los datos tan alarmantes que nos acontecen. Es por todos estos números y porque es una realidad cercana para nuestros padres y en unos años nuestra generación, por eso debería ser una prioridad en investigación debido a la cantidad de población envejecida que existe.
+
+[Alzheimer's association](https://www.alz.org/es/dementia-alzheimers-spain.asp)
+
+<br>

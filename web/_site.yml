@@ -1,0 +1,19 @@
+name: "insilicoAlba"
+navbar:
+  title: "My Website"
+  left:
+    - text: "Intro"
+      href: index.html
+    - text: "Datos"
+      href: about.html
+output_dir: "."
+output:
+  BiocStyle::html_document:
+    fig_caption: yes
+    fig_crop: no
+    toc: yes
+    toc_float: yes
+    number_sections: no
+    css: styles.css
+    theme: yeti
+    highlight: textmate
