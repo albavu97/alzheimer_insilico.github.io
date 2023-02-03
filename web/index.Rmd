@@ -1,7 +1,6 @@
 ---
 title: "Introducción"
 author: "Alba Vallejo Urruchi"
-subtitle: "Universidad de Valencia"
 ---
 <br>
 

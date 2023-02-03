@@ -1,7 +1,6 @@
 ---
 title: "Resultados y conclusión"
 author: "Alba Vallejo Urruchi"
-subtitle: "Universidad de Valencia"
 ---
 
 # Resultados
@@ -58,7 +57,7 @@ Agradezco la atención hasta el final y el proyecto está disponible en github. 
 
 (Enlace proyecto Github)[https://github.com/albavu97/alzheimer_insilico.github.io]
 
-```{r pressure, echo=FALSE, fig.cap="A caption",  fig.width=5, fig.height=6}
+```{r pressure, echo=FALSE,  fig.width=3, fig.height=4}
 knitr::include_graphics("tmp/brain.png")
 ```
 

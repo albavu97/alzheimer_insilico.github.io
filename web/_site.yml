@@ -11,7 +11,7 @@ navbar:
 output_dir: "site"
 output:
   BiocStyle::html_document:
-    fig_caption: yes
+    fig_caption: no
     fig_crop: no
     toc: yes
     toc_float: yes

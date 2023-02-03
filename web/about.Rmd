@@ -249,7 +249,7 @@ Lo que pasa es que no todos los genes están anotados, entonces se ha hecho un c
 select_fit <- fit_1[fit_1$p.value < 1E-5,]$p.value
 
 #Columnas de anotacion seleccionadas
-final <- fData(eset)[rownames(select_fit),c("ID","GENE_NAME","GENE_SYMBOL","DESCRIPTION","GO_ID","ENSEMBL_ID")]
+final <- fData(gse138261)[rownames(select_fit),c("ID","GENE_NAME","GENE_SYMBOL","DESCRIPTION","GO_ID","ENSEMBL_ID")]
 
 datos <- final[final$GENE_SYMBOL!= "",]
 #Extraemos p-valor

@@ -399,7 +399,7 @@ length(gse138261_raw)</code></pre>
 <p>Una vez que ya hemos extraído de GEO los archivos del “Expression Set”, lo que vemos es que los valores de expresión son altos. Para poder trabajar mejor se aplica el logaritmo base 2 y representamos el resultado con un .</p>
 <pre class="r"><code>exprs(gse138261_raw) &lt;- log2(exprs(gse138261_raw))
 boxplot(exprs(gse138261_raw), outline = FALSE)</code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-5-1.png" width="100%" /></p>
+<p><img src="about_files/figure-html/unnamed-chunk-3-1.png" width="100%" /></p>
 </div>
 <div id="mapa-de-calor-pheatmap" class="section level2">
 <h2>Mapa de calor (pheatmap)</h2>
@@ -413,11 +413,11 @@ sampleInfo &lt;- dplyr::rename(sampleInfo, age = &quot;age:ch1&quot;,
     gender = &quot;gender:ch1&quot;)
 corMatrix &lt;- cor(exprs(gse138261_raw), use = &quot;c&quot;)
 pheatmap(corMatrix)</code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-6-1.png" width="100%" /></p>
+<p><img src="about_files/figure-html/unnamed-chunk-4-1.png" width="100%" /></p>
 <p>El mismo mapa de calor pero con más información también de las variables de edad, género y viendo cuáles pertenecen a Alzheimer (AD) y al control.</p>
 <pre class="r"><code>rownames(sampleInfo) &lt;- colnames(corMatrix)
 pheatmap(corMatrix, annotation_col = sampleInfo)</code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-7-1.png" width="100%" /></p>
+<p><img src="about_files/figure-html/unnamed-chunk-5-1.png" width="100%" /></p>
 </div>
 <div id="pca" class="section level2">
 <h2>PCA</h2>
@@ -429,7 +429,7 @@ cbind(sampleInfo, pca$x) %&gt;%
     ggplot(aes(x = PC1, y = PC2, col = disease_state,
         label = paste(&quot;Age&quot;, age))) + geom_point() +
     geom_text_repel()</code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-8-1.png" width="100%" /></p>
+<p><img src="about_files/figure-html/unnamed-chunk-6-1.png" width="100%" /></p>
 </div>
 </div>
 <div id="normalización" class="section level1">
@@ -509,7 +509,7 @@ colnames(mean.expression) &lt;- conditions.id
 ## comparación entre
 ## genotipos/condiciones.
 plot(control, AD, xlab = &quot;control&quot;, ylab = &quot;AD&quot;)</code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-10-1.png" width="100%" /></p>
+<p><img src="about_files/figure-html/unnamed-chunk-8-1.png" width="100%" /></p>
 </div>
 <div id="expresión-diferencial" class="section level1">
 <h1>Expresión diferencial</h1>
@@ -659,7 +659,7 @@ select_fit &lt;- fit_1[fit_1$p.value &lt; 1e-05,
     ]$p.value
 
 # Columnas de anotacion seleccionadas
-final &lt;- fData(eset)[rownames(select_fit),
+final &lt;- fData(gse138261)[rownames(select_fit),
     c(&quot;ID&quot;, &quot;GENE_NAME&quot;, &quot;GENE_SYMBOL&quot;, &quot;DESCRIPTION&quot;,
         &quot;GO_ID&quot;, &quot;ENSEMBL_ID&quot;)]
 
