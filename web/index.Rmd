@@ -29,6 +29,8 @@ situación actual en este tipo de proyectos a nivel de bioinformática.
 Se propone intentar realizar un análisis de enriquecimiento funcional basado en estudio del
 genoma del cerebro, considerando diferentes grupos de estudio, caso como control.
 
+Paper asociado al estudio: [https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8758480/]
+
 <br>
 
 ## Motivación 

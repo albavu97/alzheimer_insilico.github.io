@@ -40,14 +40,22 @@ knitr::opts_chunk$set(echo = TRUE)
 library(knitr)
 # Set so that long lines in R will be wrapped:
 opts_chunk$set(tidy.opts=list(width.cutoff=40),tidy=TRUE)
+library(pheatmap)
+library(GEOquery)
+library(ggplot2)
+library(ggrepel)
+library(dplyr)
+library(pheatmap)
+library(limma)
 ```
 
 ```{r, eval = doAll, fig.width=4, fig.height=4, results='hide',warning=FALSE,message=FALSE}
-library(GEOquery)
 id_gse <- "GSE138261"
 gse138261_raw <- getGEO(id_gse)[[1]]
 length(gse138261_raw)
 ```
+
+## Boxplot
 
 Una vez que ya hemos extraído de GEO los archivos del "Expression Set", lo que vemos es que los valores de expresión son altos. Para poder trabajar mejor se aplica el logaritmo base 2 y representamos el resultado con un \texit{boxplot}.
 
@@ -56,11 +64,11 @@ exprs(gse138261_raw) <- log2(exprs(gse138261_raw))
 boxplot(exprs(gse138261_raw),outline=FALSE)
 ```
 
+## Mapa de calor (pheatmap)
+
 Ahora vamos a ver un mapa de calor, en el que se ve la interacción entre las distintas muestras, contra más cercanas a 0, el valor es menos representativo, es decir, esas muestras tienen menos que ver.
 
 ```{r, eval = doAll, fig.width=8, fig.height=6,warning=FALSE}
-library(dplyr)
-
 sampleInfo <- pData(gse138261_raw)
 
 sampleInfo <- select(sampleInfo, "age:ch1","disease state:ch1","gender:ch1")
@@ -77,14 +85,65 @@ pheatmap(corMatrix,
          annotation_col=sampleInfo) 
 ```
 
+## PCA
+
 El último gráfico ha sido un poco de investigación propio y ver cómo se puede hacer, se calcula pca (principal components analysis) y se van a agrupar viendo cómo de separadas están los AD de los control y también de cada muestra se ve la edad del paciente.
 
 ```{r, eval = doAll, fig.width=8, fig.height=6,warning=FALSE}
-library(ggplot2)
-library(ggrepel)
-
 pca <- prcomp(t(exprs(gse138261_raw)))
 
 cbind(sampleInfo, pca$x) %>% 
   ggplot(aes(x = PC1, y=PC2, col=disease_state,label=paste("Age", age))) + geom_point() + geom_text_repel()
+```
+
+# Normalización
+
+Normalizamos los datos entre arrays, normalmente esto se suele hacer con la descarga de los archivos .CEL, pero este método también permite hacer en el array de expresión directamente.
+
+```{r, eval = doAll, fig.width=8, fig.height=6,warning=FALSE}
+gse138261 <- gse138261_raw
+exprs(gse138261) = normalizeBetweenArrays(exprs(gse138261_raw))
+```
+
+# Plot nivel medio de expresión de los grupos Control - AD
+
+```{r, eval = doAll, fig.width=8, fig.height=6,warning=FALSE}
+probenames = rownames(gse138261)
+pData(gse138261)
+length(colnames(gse138261))
+sampleId <- c("AD_1","AD_2","AD_3","AD_4","AD_5","AD_6","AD_7","AD_8","AD_9","AD_10","AD_11","AD_12","AD_13","AD_14","AD_15","AD_16","AD_17",
+              "control_1", "control_2", "control_3", "control_4", "control_5", "control_6", "control_7", "control_8", "control_9", "control_10",
+              "control_11","control_12","control_13","control_14","control_15","control_16", "control_17","control_18","control_19")
+colnames(gse138261) <- sampleId
+
+## Calculamos los valores medios de expresión para cada genotipo/condición 
+## sumando las correspondientes columnas y dividiendo por el número de réplicas
+expression.level = exprs(gse138261)
+control = (expression.level[,"control_1"] + expression.level[,"control_1"]+ expression.level[,"control_2"]+ expression.level[,"control_3"]
+           + expression.level[,"control_4"]+ expression.level[,"control_5"]+ expression.level[,"control_6"]
+           + expression.level[,"control_7"]+ expression.level[,"control_8"]+ expression.level[,"control_9"]
+           + expression.level[,"control_10"]+ expression.level[,"control_11"]+ expression.level[,"control_12"]
+           + expression.level[,"control_13"]+ expression.level[,"control_14"]+ expression.level[,"control_15"]
+           + expression.level[,"control_16"]+ expression.level[, "control_17"]+ expression.level[,"control_18"]
+           + expression.level[,"control_19"])/19
+
+AD = (expression.level[,"AD_1"] + expression.level[,"AD_1"]+ expression.level[,"AD_2"]+ expression.level[,"AD_3"]
+      + expression.level[,"AD_4"]+ expression.level[,"AD_5"]+ expression.level[,"AD_6"]
+      + expression.level[,"AD_7"]+ expression.level[,"AD_8"]+ expression.level[,"AD_9"]
+      + expression.level[,"AD_10"]+ expression.level[,"AD_11"]+ expression.level[,"AD_12"]
+      + expression.level[,"AD_13"]+ expression.level[,"AD_14"]+ expression.level[,"AD_15"]
+      + expression.level[,"AD_16"]+ expression.level[, "AD_17"])/17
+
+## Creamos una matriz que contenga por columna la expresión media para cada 
+## condición o genotipo. Nombramos las filas con el nombre de las sondas (genes) 
+## y la columnas con la condición o genotipo. 
+mean.expression <- matrix(c(control,AD),ncol=2)
+conditions.id <- c("control","AD")
+rownames(mean.expression) <- names(control)
+colnames(mean.expression) <- conditions.id
+
+## Scatterplots o gráficos de dispersión para la comparción de distintos 
+## genotipos/condiciones. Este tipo de gráficos nos permite obtener una visión 
+## global de la comparación entre genotipos/condiciones.
+plot(control,AD,xlab="control",ylab="AD")
 ```
