@@ -11,9 +11,9 @@
 
 <meta name="author" content="Alba Vallejo Urruchi" />
 
-<meta name="date" content="2023-02-02" />
+<meta name="date" content="2023-02-03" />
 
-<title>Datos del estudio</title>
+<title>Resultados y conclusión</title>
 
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -318,7 +318,7 @@ function toggle_visibility(id1) {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">My Website</a>
+      <a class="navbar-brand" href="index.html">Insilico final</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
@@ -326,10 +326,10 @@ function toggle_visibility(id1) {
   <a href="index.html">Intro</a>
 </li>
 <li>
-  <a href="about.html">Datos</a>
+  <a href="about.html">Desarrollo</a>
 </li>
 <li>
-  <a href="analisis.html">Análisis</a>
+  <a href="analisis.html">Resultados</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -343,100 +343,62 @@ function toggle_visibility(id1) {
 
 
 
-<h1 class="title toc-ignore">Datos del estudio</h1>
+<h1 class="title toc-ignore">Resultados y conclusión</h1>
 <h3 class="subtitle">Universidad de Valencia</h3>
 <p class="author-name">Alba Vallejo Urruchi</p>
-<h4 class="date">2 February 2023</h4>
+<h4 class="date">3 February 2023</h4>
 
 </div>
 
 
-<div id="expresión-diferencial" class="section level1">
-<h1>Expresión diferencial</h1>
-<p>Uno de los paquetes principales de expresión diferencial es <code>limma</code>, que además de verlo en esta asignatura también se usó el cuatrimestre pasado en la asignatura de <strong>Bioinformática estadística</strong>. Para poder hacer este análisi hay que crear un <code>model.matrix</code>que es una matriz con el diseño del modelo, es decir, dependiendo de las variables que se quieran tener en cuenta, por cada muestra se pone 0 que significa que la fila (muestra) pertenece al grupo/variable (columna).</p>
-<p>En nuestro caso se elaborará un <code>model.matrix</code> con casos(AD) y controles para luego aplicar el análisis diferencial.</p>
-<pre class="r"><code>library(limma)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;limma&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:BiocGenerics&#39;:
-## 
-##     plotMA</code></pre>
-<pre class="r"><code>design &lt;- model.matrix(~0+sampleInfo$disease_state)
-design</code></pre>
-<pre><code>##    sampleInfo$disease_stateAD sampleInfo$disease_stateControl
-## 1                           1                               0
-## 2                           1                               0
-## 3                           1                               0
-## 4                           1                               0
-## 5                           1                               0
-## 6                           1                               0
-## 7                           1                               0
-## 8                           1                               0
-## 9                           1                               0
-## 10                          1                               0
-## 11                          1                               0
-## 12                          1                               0
-## 13                          1                               0
-## 14                          1                               0
-## 15                          1                               0
-## 16                          1                               0
-## 17                          1                               0
-## 18                          0                               1
-## 19                          0                               1
-## 20                          0                               1
-## 21                          0                               1
-## 22                          0                               1
-## 23                          0                               1
-## 24                          0                               1
-## 25                          0                               1
-## 26                          0                               1
-## 27                          0                               1
-## 28                          0                               1
-## 29                          0                               1
-## 30                          0                               1
-## 31                          0                               1
-## 32                          0                               1
-## 33                          0                               1
-## 34                          0                               1
-## 35                          0                               1
-## 36                          0                               1
-## attr(,&quot;assign&quot;)
-## [1] 1 1
-## attr(,&quot;contrasts&quot;)
-## attr(,&quot;contrasts&quot;)$`sampleInfo$disease_state`
-## [1] &quot;contr.treatment&quot;</code></pre>
-<pre class="r"><code>## the column names are a bit ugly, so we will rename
-colnames(design) &lt;- c(&quot;AD&quot;,&quot;Control&quot;)
-
-summary(exprs(gse138261_raw))</code></pre>
-<pre><code>##    GSM4103849       GSM4103850       GSM4103851       GSM4103852       GSM4103853       GSM4103854       GSM4103855       GSM4103856       GSM4103857    
-##  Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319  
-##  1st Qu.:1.2414   1st Qu.:1.2411   1st Qu.:1.2417   1st Qu.:1.2404   1st Qu.:1.2378   1st Qu.:1.2384   1st Qu.:1.2390   1st Qu.:1.2398   1st Qu.:1.2380  
-##  Median :2.2505   Median :2.2492   Median :2.2500   Median :2.2517   Median :2.2503   Median :2.2509   Median :2.2503   Median :2.2507   Median :2.2494  
-##  Mean   :2.1237   Mean   :2.1230   Mean   :2.1236   Mean   :2.1243   Mean   :2.1229   Mean   :2.1237   Mean   :2.1235   Mean   :2.1237   Mean   :2.1227  
-##  3rd Qu.:2.8195   3rd Qu.:2.8182   3rd Qu.:2.8187   3rd Qu.:2.8204   3rd Qu.:2.8192   3rd Qu.:2.8201   3rd Qu.:2.8197   3rd Qu.:2.8200   3rd Qu.:2.8188  
-##  Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689  
-##    GSM4103858       GSM4103859       GSM4103860       GSM4103861       GSM4103862       GSM4103863       GSM4103864       GSM4103865       GSM4103866    
-##  Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319  
-##  1st Qu.:1.2390   1st Qu.:1.2382   1st Qu.:1.2365   1st Qu.:1.2392   1st Qu.:1.2424   1st Qu.:1.2368   1st Qu.:1.2389   1st Qu.:1.2397   1st Qu.:1.2425  
-##  Median :2.2497   Median :2.2500   Median :2.2507   Median :2.2486   Median :2.2491   Median :2.2482   Median :2.2494   Median :2.2493   Median :2.2516  
-##  Mean   :2.1229   Mean   :2.1231   Mean   :2.1234   Mean   :2.1222   Mean   :2.1230   Mean   :2.1217   Mean   :2.1229   Mean   :2.1226   Mean   :2.1242  
-##  3rd Qu.:2.8190   3rd Qu.:2.8194   3rd Qu.:2.8203   3rd Qu.:2.8177   3rd Qu.:2.8175   3rd Qu.:2.8174   3rd Qu.:2.8185   3rd Qu.:2.8179   3rd Qu.:2.8197  
-##  Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689  
-##    GSM4103867       GSM4103868       GSM4103869       GSM4103870       GSM4103871       GSM4103872       GSM4103873       GSM4103874       GSM4103875    
-##  Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319  
-##  1st Qu.:1.2426   1st Qu.:1.2421   1st Qu.:1.2398   1st Qu.:1.2412   1st Qu.:1.2410   1st Qu.:1.2397   1st Qu.:1.2385   1st Qu.:1.2372   1st Qu.:1.2409  
-##  Median :2.2498   Median :2.2501   Median :2.2500   Median :2.2502   Median :2.2490   Median :2.2497   Median :2.2507   Median :2.2500   Median :2.2492  
-##  Mean   :2.1231   Mean   :2.1235   Mean   :2.1233   Mean   :2.1236   Mean   :2.1228   Mean   :2.1229   Mean   :2.1234   Mean   :2.1226   Mean   :2.1230  
-##  3rd Qu.:2.8175   3rd Qu.:2.8185   3rd Qu.:2.8192   3rd Qu.:2.8195   3rd Qu.:2.8181   3rd Qu.:2.8182   3rd Qu.:2.8194   3rd Qu.:2.8185   3rd Qu.:2.8182  
-##  Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689  
-##    GSM4103876       GSM4103877       GSM4103878       GSM4103879       GSM4103880       GSM4103881       GSM4103882       GSM4103883       GSM4103884    
-##  Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319   Min.   :0.8319  
-##  1st Qu.:1.2349   1st Qu.:1.2420   1st Qu.:1.2408   1st Qu.:1.2380   1st Qu.:1.2369   1st Qu.:1.2411   1st Qu.:1.2395   1st Qu.:1.2384   1st Qu.:1.2414  
-##  Median :2.2469   Median :2.2493   Median :2.2486   Median :2.2508   Median :2.2494   Median :2.2491   Median :2.2490   Median :2.2490   Median :2.2488  
-##  Mean   :2.1208   Mean   :2.1228   Mean   :2.1223   Mean   :2.1234   Mean   :2.1225   Mean   :2.1227   Mean   :2.1226   Mean   :2.1224   Mean   :2.1228  
-##  3rd Qu.:2.8171   3rd Qu.:2.8175   3rd Qu.:2.8173   3rd Qu.:2.8194   3rd Qu.:2.8183   3rd Qu.:2.8176   3rd Qu.:2.8186   3rd Qu.:2.8181   3rd Qu.:2.8176  
-##  Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689   Max.   :4.2689</code></pre>
+<div id="resultados" class="section level1">
+<h1>Resultados</h1>
+<p>El estudio era bastante complejo y además el cerebro es un órgano también complicado. Podría decir que la elección de los datos inicialmente quizá no fue la adecuada, pues los resultados tampoco han sido muy aclaratorios.</p>
+<p>A modo de resultados, lo que si que he hecho es buscar en páginas/herramientas desarrolladas en exclusiva para el estudio del cerebro y buscar ahí los GENE_SYMBOL que se encontraron con los p-valores más bajos. Sé que a nivel estadístico se tiene que hacer un estudio más exhaustivo para poder comprobar que realmente nos podemos fiar de ese p-valor que a veces tanto quebraderos de cabeza da en ciencia. Dicho esto iré analizando cada uno de los genes en diferentes webs:</p>
+<p><strong>CHAT</strong></p>
+<ul>
+<li><p>Web: [<a href="https://www.cdtdb.neuroinf.jp/CDT/ReferCDInformation.do?cdid=CD31864" class="uri">https://www.cdtdb.neuroinf.jp/CDT/ReferCDInformation.do?cdid=CD31864</a>]</p></li>
+<li><p>Descripción: choline acetyltransferase</p></li>
+</ul>
+<p><strong>STRC</strong></p>
+<ul>
+<li><p>Web: [<a href="https://www.cdtdb.neuroinf.jp/CDT/ReferCDInformation.do?cdid=CD18918" class="uri">https://www.cdtdb.neuroinf.jp/CDT/ReferCDInformation.do?cdid=CD18918</a>]</p></li>
+<li><p>Descripción: stereocilin</p></li>
+</ul>
+<p><strong>FAD32</strong></p>
+<ul>
+<li><p>Web: [<a href="https://www.cdtdb.neuroinf.jp/CDT/ReferCDInformation.do?cdid=CD04954" class="uri">https://www.cdtdb.neuroinf.jp/CDT/ReferCDInformation.do?cdid=CD04954</a>]</p></li>
+<li><p>Descripción: fatty acid desaturase 2</p></li>
+</ul>
+<p><strong>TMEM8C</strong></p>
+<ul>
+<li><p>Web: [<a href="https://www.cdtdb.neuroinf.jp/CDT/ReferCDInformation.do?cdid=CD16888" class="uri">https://www.cdtdb.neuroinf.jp/CDT/ReferCDInformation.do?cdid=CD16888</a>]</p></li>
+<li><p>Descripción: transmembrane protein 8C (componente celular)</p></li>
+</ul>
+<p><strong>CSNK1G1</strong></p>
+<ul>
+<li><p>Web: [<a href="https://www.cdtdb.neuroinf.jp/CDT/ReferCDInformation.do?cdid=CD23552" class="uri">https://www.cdtdb.neuroinf.jp/CDT/ReferCDInformation.do?cdid=CD23552</a>]</p></li>
+<li><p>Descripción: casein kinase 1, gamma 1</p></li>
+</ul>
+<p><strong>NFXL1</strong></p>
+<ul>
+<li><p>Web: [<a href="https://www.cdtdb.neuroinf.jp/CDT/ReferCDInformation.do?cdid=CD04154" class="uri">https://www.cdtdb.neuroinf.jp/CDT/ReferCDInformation.do?cdid=CD04154</a>]</p></li>
+<li><p>Descripción: nuclear transcription factor, X-box binding-like 1 (metal ion binding)</p></li>
+</ul>
+<p>Existen otras dos webs que se nombraron en el resumen del estudio que son : [<a href="https://portal.brain-map.org/" class="uri">https://portal.brain-map.org/</a>] y [<a href="https://hbatlas.org/" class="uri">https://hbatlas.org/</a>]</p>
+<p>Esto es una pequeña ayuda, pero también se podría hacer para futuros estudios un enriquecimiento en términos GO con el objetivo de localizar cuáles son los grupos GO más representados en los genes más expresados del contraste. Incluso sería interesante hacer también otros contrastes, por ejemplo, entres hombres y mujeres porque puede que afecta de un modo diferente a unos y otros.</p>
+</div>
+<div id="conclusión" class="section level1">
+<h1>Conclusión</h1>
+<p>La búsqueda de genes y sus funciones a partir de Tilling Array que no se había visto ahora ha supuesto un reto, a veces quizá no pudiendo haber realizado las cosas cómo me hubiera gustado. Pero también este estudio ha servido para iniciarme y como siempre enfrentarme a un reto bioinformática e intentar llegar a una solución de la mejor manera posible. No muy contenta con el resultado, también debería tener un conocimiento más amplio del cerebro para poder hacer una conclusión correcta y adecuada. Con esto concluyo este trabajo.</p>
+<p>Agradezco la atención hasta el final y el proyecto está disponible en github. Cualquier sugerencia será siempre bien recibida.</p>
+<p>(Enlace proyecto Github)[<a href="https://github.com/albavu97/alzheimer_insilico.github.io" class="uri">https://github.com/albavu97/alzheimer_insilico.github.io</a>]</p>
+<div class="figure"><span style="display:block;" id="fig:pressure"></span>
+<img src="tmp/brain.png" alt="A caption" width="100%" />
+<p class="caption">
+Figure 1: <span class="caption-title">A caption</span><br>
+</p>
+</div>
 </div>
 
 

@@ -5,6 +5,8 @@ subtitle: "Universidad de Valencia"
 ---
 <br>
 
+**Análisis funcional de muestras de pacientes control y con la enfermedad de Alzheimer**
+
 Este es el trabajo final de la asignatura de estudios in silico en biomedicina. Y lo primero, algo que hemos estado haciendo a lo largo de todas las clases es ir simulando mediante el ordenador procesos/análisis biológicos y es que esa es la definición de **estudios in silico**: rama de la biología computacional cuyo objetivo es explorar y experimentar con procesos biológicos de simulaciones hechas por ordenador. 
 
 ----

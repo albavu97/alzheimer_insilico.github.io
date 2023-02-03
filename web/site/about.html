@@ -11,9 +11,9 @@
 
 <meta name="author" content="Alba Vallejo Urruchi" />
 
-<meta name="date" content="2023-02-02" />
+<meta name="date" content="2023-02-03" />
 
-<title>Datos del estudio</title>
+<title>Desarrollo del estudio</title>
 
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -318,7 +318,7 @@ function toggle_visibility(id1) {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">My Website</a>
+      <a class="navbar-brand" href="index.html">Insilico final</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
@@ -326,10 +326,10 @@ function toggle_visibility(id1) {
   <a href="index.html">Intro</a>
 </li>
 <li>
-  <a href="about.html">Datos</a>
+  <a href="about.html">Desarrollo</a>
 </li>
 <li>
-  <a href="analisis.html">Análisis</a>
+  <a href="analisis.html">Resultados</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -343,10 +343,10 @@ function toggle_visibility(id1) {
 
 
 
-<h1 class="title toc-ignore">Datos del estudio</h1>
+<h1 class="title toc-ignore">Desarrollo del estudio</h1>
 <h3 class="subtitle">Universidad de Valencia</h3>
 <p class="author-name">Alba Vallejo Urruchi</p>
-<h4 class="date">2 February 2023</h4>
+<h4 class="date">3 February 2023</h4>
 
 </div>
 
@@ -391,42 +391,286 @@ function toggle_visibility(id1) {
 <div id="análisis-exploratorio" class="section level1">
 <h1>Análisis exploratorio</h1>
 <p>En este apartado lo que se va hacer es intentar generar algún tipo de gráfico para poder poder ver algún tipo de patrón (si fuera posible).</p>
-<pre class="r"><code>library(GEOquery)
-id_gse &lt;- &quot;GSE138261&quot;
+<pre class="r"><code>id_gse &lt;- &quot;GSE138261&quot;
 gse138261_raw &lt;- getGEO(id_gse)[[1]]
 length(gse138261_raw)</code></pre>
+<div id="boxplot" class="section level2">
+<h2>Boxplot</h2>
 <p>Una vez que ya hemos extraído de GEO los archivos del “Expression Set”, lo que vemos es que los valores de expresión son altos. Para poder trabajar mejor se aplica el logaritmo base 2 y representamos el resultado con un .</p>
 <pre class="r"><code>exprs(gse138261_raw) &lt;- log2(exprs(gse138261_raw))
 boxplot(exprs(gse138261_raw), outline = FALSE)</code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-2-1.png" width="100%" /></p>
+<p><img src="about_files/figure-html/unnamed-chunk-5-1.png" width="100%" /></p>
+</div>
+<div id="mapa-de-calor-pheatmap" class="section level2">
+<h2>Mapa de calor (pheatmap)</h2>
 <p>Ahora vamos a ver un mapa de calor, en el que se ve la interacción entre las distintas muestras, contra más cercanas a 0, el valor es menos representativo, es decir, esas muestras tienen menos que ver.</p>
 <pre class="r"><code>library(dplyr)
-
 sampleInfo &lt;- pData(gse138261_raw)
-
-sampleInfo &lt;- select(sampleInfo, &quot;age:ch1&quot;,
+sampleInfo &lt;- dplyr::select(sampleInfo, &quot;age:ch1&quot;,
     &quot;disease state:ch1&quot;, &quot;gender:ch1&quot;)
-sampleInfo &lt;- rename(sampleInfo, age = &quot;age:ch1&quot;,
+sampleInfo &lt;- dplyr::rename(sampleInfo, age = &quot;age:ch1&quot;,
     disease_state = &quot;disease state:ch1&quot;,
     gender = &quot;gender:ch1&quot;)
 corMatrix &lt;- cor(exprs(gse138261_raw), use = &quot;c&quot;)
 pheatmap(corMatrix)</code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-3-1.png" width="100%" /></p>
+<p><img src="about_files/figure-html/unnamed-chunk-6-1.png" width="100%" /></p>
 <p>El mismo mapa de calor pero con más información también de las variables de edad, género y viendo cuáles pertenecen a Alzheimer (AD) y al control.</p>
 <pre class="r"><code>rownames(sampleInfo) &lt;- colnames(corMatrix)
 pheatmap(corMatrix, annotation_col = sampleInfo)</code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-4-1.png" width="100%" /></p>
+<p><img src="about_files/figure-html/unnamed-chunk-7-1.png" width="100%" /></p>
+</div>
+<div id="pca" class="section level2">
+<h2>PCA</h2>
 <p>El último gráfico ha sido un poco de investigación propio y ver cómo se puede hacer, se calcula pca (principal components analysis) y se van a agrupar viendo cómo de separadas están los AD de los control y también de cada muestra se ve la edad del paciente.</p>
 <pre class="r"><code>library(ggplot2)
-library(ggrepel)
-
 pca &lt;- prcomp(t(exprs(gse138261_raw)))
 
 cbind(sampleInfo, pca$x) %&gt;%
     ggplot(aes(x = PC1, y = PC2, col = disease_state,
         label = paste(&quot;Age&quot;, age))) + geom_point() +
     geom_text_repel()</code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-5-1.png" width="100%" /></p>
+<p><img src="about_files/figure-html/unnamed-chunk-8-1.png" width="100%" /></p>
+</div>
+</div>
+<div id="normalización" class="section level1">
+<h1>Normalización</h1>
+<p>Normalizamos los datos entre arrays, normalmente esto se suele hacer con la descarga de los archivos .CEL, pero este método también permite hacer en el array de expresión directamente.</p>
+<pre class="r"><code>gse138261 &lt;- gse138261_raw
+exprs(gse138261) = normalizeBetweenArrays(exprs(gse138261_raw))</code></pre>
+</div>
+<div id="plot-nivel-medio-de-expresión-de-los-grupos-control---ad" class="section level1">
+<h1>Plot nivel medio de expresión de los grupos Control - AD</h1>
+<pre class="r"><code>library(ggplot2)
+probenames = rownames(gse138261)
+length(colnames(gse138261))</code></pre>
+<pre><code>## [1] 36</code></pre>
+<pre class="r"><code>sampleId &lt;- c(&quot;AD_1&quot;, &quot;AD_2&quot;, &quot;AD_3&quot;, &quot;AD_4&quot;,
+    &quot;AD_5&quot;, &quot;AD_6&quot;, &quot;AD_7&quot;, &quot;AD_8&quot;, &quot;AD_9&quot;,
+    &quot;AD_10&quot;, &quot;AD_11&quot;, &quot;AD_12&quot;, &quot;AD_13&quot;, &quot;AD_14&quot;,
+    &quot;AD_15&quot;, &quot;AD_16&quot;, &quot;AD_17&quot;, &quot;control_1&quot;,
+    &quot;control_2&quot;, &quot;control_3&quot;, &quot;control_4&quot;,
+    &quot;control_5&quot;, &quot;control_6&quot;, &quot;control_7&quot;,
+    &quot;control_8&quot;, &quot;control_9&quot;, &quot;control_10&quot;,
+    &quot;control_11&quot;, &quot;control_12&quot;, &quot;control_13&quot;,
+    &quot;control_14&quot;, &quot;control_15&quot;, &quot;control_16&quot;,
+    &quot;control_17&quot;, &quot;control_18&quot;, &quot;control_19&quot;)
+colnames(gse138261) &lt;- sampleId
+
+## Calculamos los valores medios de
+## expresión para cada
+## genotipo/condición sumando las
+## correspondientes columnas y
+## dividiendo por el número de réplicas
+expression.level = exprs(gse138261)
+control = (expression.level[, &quot;control_1&quot;] +
+    expression.level[, &quot;control_2&quot;] + expression.level[,
+    &quot;control_3&quot;] + expression.level[, &quot;control_4&quot;] +
+    expression.level[, &quot;control_5&quot;] + expression.level[,
+    &quot;control_6&quot;] + expression.level[, &quot;control_7&quot;] +
+    expression.level[, &quot;control_8&quot;] + expression.level[,
+    &quot;control_9&quot;] + expression.level[, &quot;control_10&quot;] +
+    expression.level[, &quot;control_11&quot;] + expression.level[,
+    &quot;control_12&quot;] + expression.level[, &quot;control_13&quot;] +
+    expression.level[, &quot;control_14&quot;] + expression.level[,
+    &quot;control_15&quot;] + expression.level[, &quot;control_16&quot;] +
+    expression.level[, &quot;control_17&quot;] + expression.level[,
+    &quot;control_18&quot;] + expression.level[, &quot;control_19&quot;])/19
+
+AD = (expression.level[, &quot;AD_1&quot;] + expression.level[,
+    &quot;AD_1&quot;] + expression.level[, &quot;AD_2&quot;] +
+    expression.level[, &quot;AD_3&quot;] + expression.level[,
+    &quot;AD_4&quot;] + expression.level[, &quot;AD_5&quot;] +
+    expression.level[, &quot;AD_6&quot;] + expression.level[,
+    &quot;AD_7&quot;] + expression.level[, &quot;AD_8&quot;] +
+    expression.level[, &quot;AD_9&quot;] + expression.level[,
+    &quot;AD_10&quot;] + expression.level[, &quot;AD_11&quot;] +
+    expression.level[, &quot;AD_12&quot;] + expression.level[,
+    &quot;AD_13&quot;] + expression.level[, &quot;AD_14&quot;] +
+    expression.level[, &quot;AD_15&quot;] + expression.level[,
+    &quot;AD_16&quot;] + expression.level[, &quot;AD_17&quot;])/17
+
+## Creamos una matriz que contenga por
+## columna la expresión media para cada
+## condición o genotipo. Nombramos las
+## filas con el nombre de las sondas
+## (genes) y la columnas con la
+## condición o genotipo.
+mean.expression &lt;- matrix(c(control, AD),
+    ncol = 2)
+conditions.id &lt;- c(&quot;control&quot;, &quot;AD&quot;)
+rownames(mean.expression) &lt;- names(control)
+colnames(mean.expression) &lt;- conditions.id
+
+## Scatterplots o gráficos de
+## dispersión para la comparción de
+## distintos genotipos/condiciones.
+## Este tipo de gráficos nos permite
+## obtener una visión global de la
+## comparación entre
+## genotipos/condiciones.
+plot(control, AD, xlab = &quot;control&quot;, ylab = &quot;AD&quot;)</code></pre>
+<p><img src="about_files/figure-html/unnamed-chunk-10-1.png" width="100%" /></p>
+</div>
+<div id="expresión-diferencial" class="section level1">
+<h1>Expresión diferencial</h1>
+<p>Uno de los paquetes principales de expresión diferencial es <code>limma</code>, que además de verlo en esta asignatura también se usó el cuatrimestre pasado en la asignatura de <strong>Bioinformática estadística</strong>. Para poder hacer este análisi hay que crear un <code>model.matrix</code>que es una matriz con el diseño del modelo, es decir, dependiendo de las variables que se quieran tener en cuenta, por cada muestra se pone 0 que significa que la fila (muestra) pertenece al grupo/variable (columna).</p>
+<p>En nuestro caso se elaborará un <code>model.matrix</code> con casos(AD) y controles para luego aplicar el análisis diferencial.</p>
+<pre class="r"><code>library(limma)
+# Generamos el model.matrix (control vs
+# AD)
+design &lt;- model.matrix(~0 + sampleInfo$disease_state)
+design</code></pre>
+<pre><code>##    sampleInfo$disease_stateAD sampleInfo$disease_stateControl
+## 1                           1                               0
+## 2                           1                               0
+## 3                           1                               0
+## 4                           1                               0
+## 5                           1                               0
+## 6                           1                               0
+## 7                           1                               0
+## 8                           1                               0
+## 9                           1                               0
+## 10                          1                               0
+## 11                          1                               0
+## 12                          1                               0
+## 13                          1                               0
+## 14                          1                               0
+## 15                          1                               0
+## 16                          1                               0
+## 17                          1                               0
+## 18                          0                               1
+## 19                          0                               1
+## 20                          0                               1
+## 21                          0                               1
+## 22                          0                               1
+## 23                          0                               1
+## 24                          0                               1
+## 25                          0                               1
+## 26                          0                               1
+## 27                          0                               1
+## 28                          0                               1
+## 29                          0                               1
+## 30                          0                               1
+## 31                          0                               1
+## 32                          0                               1
+## 33                          0                               1
+## 34                          0                               1
+## 35                          0                               1
+## 36                          0                               1
+## attr(,&quot;assign&quot;)
+## [1] 1 1
+## attr(,&quot;contrasts&quot;)
+## attr(,&quot;contrasts&quot;)$`sampleInfo$disease_state`
+## [1] &quot;contr.treatment&quot;</code></pre>
+<pre class="r"><code># Cambiamos el nombre de columnas
+colnames(design) &lt;- c(&quot;AD&quot;, &quot;Control&quot;)</code></pre>
+<p>Ahora vamos a calcular el nivel medio de expresión de todo el expression set. Con eso veremos que genes están expresados y también eliminaremos aquellos que aparecen en menos de dos muestras. Con ese subconjunto es con el que trabajaremos los contrastes.</p>
+<pre class="r"><code>## Nivel medio de expresión
+cutoff &lt;- median(exprs(gse138261))
+
+## Miramos si está por encima o por
+## debajo del nivel medio de expresión
+is_expressed &lt;- exprs(gse138261) &gt; cutoff
+
+## Nos quedamos con los genes que están
+## en más de 2 muestras
+
+keep &lt;- rowSums(is_expressed) &gt; 2
+
+## En esta tabla se ve cuáles se van a
+## eliminar
+table(keep)</code></pre>
+<pre><code>## keep
+##  FALSE   TRUE 
+## 388531 559141</code></pre>
+<pre class="r"><code>## Subconjunto de los elegidos
+gse138261 &lt;- gse138261[keep, ]
+
+fit &lt;- lmFit(exprs(gse138261), design)
+head(fit$coefficients)</code></pre>
+<pre><code>##                       AD  Control
+## (+)E1A_r60_1    3.915223 3.911811
+## (+)E1A_r60_3    2.543128 2.413052
+## (+)E1A_r60_a135 2.403210 2.418003
+## (+)E1A_r60_a20  2.740060 2.761894
+## (+)E1A_r60_a22  3.141271 3.158320
+## (+)E1A_r60_a97  3.454569 3.461472</code></pre>
+<p>Lo que se quiere ver es qué genes están diferencialmente expresados en AD y control y para eso se hace el contraste, ajustamos por Bayes y mostramos los valores ordenados por log Fold Change.</p>
+<pre class="r"><code># Especificamos un contraste
+contrasts &lt;- makeContrasts(AD - Control,
+    levels = design)
+
+fit_1 &lt;- contrasts.fit(fit, contrasts)
+fit_1 &lt;- eBayes(fit_1)
+
+topTable(fit_1, coef = 1, sort.by = &quot;logFC&quot;)</code></pre>
+<pre><code>##                             logFC  AveExpr        t      P.Value    adj.P.Val         B
+## ACUST_44910_PI426217869 0.8894111 1.674204 5.226946 7.694721e-06 4.501961e-04  3.633711
+## ACUST_26653_PI426217860 0.8501948 2.046779 6.620371 1.088838e-07 3.137339e-05  7.697983
+## ACUST_50190_PI426217852 0.8469658 1.635821 8.439068 5.096533e-10 1.909995e-06 12.793326
+## A_33_P3373243           0.8461040 1.836742 7.315665 1.348018e-08 9.839842e-06  9.688364
+## ACUST_76771_PI426217857 0.8379312 1.687080 6.329385 2.636986e-07 5.336708e-05  6.853865
+## ACUST_309_PI426418820   0.8321372 1.498717 7.651135 4.997020e-09 5.869829e-06 10.631534
+## ACUST_50336_PI426217857 0.8318256 1.999359 5.656864 2.063201e-06 1.916312e-04  4.889620
+## ACUST_62323_PI426217852 0.8263700 2.001036 5.097544 1.142222e-05 5.809198e-04  3.257200
+## ACUST_6732_PI426217863  0.8057775 1.763800 6.204816 3.856030e-07 6.784344e-05  6.491080
+## ACUST_60783_PI426217857 0.7820543 1.853495 6.001291 7.183581e-07 9.996208e-05  5.897010</code></pre>
+<p>Vamos a usar la función <code>decideTests</code> que lo que hace a partir del contraste hecho y los estadísticos obtenido, es decir, 1, expresados, 0 significa que es despreciable y -1 que no se debería tener en cuenta. Porque los valores de ouput vienen a decir: -1 -&gt; significativamente negativo, 0 -&gt; no significativo y 1 -&gt; significativo.</p>
+<p>En nuestro estudio tiene sentido los que son significativos pero quizá haya estudio cuáles sean los genes que tienen una significancia negativa porque quizá pueda tener un significado biológico.</p>
+<pre class="r"><code>table(decideTests(fit_1))</code></pre>
+<pre><code>## 
+##     -1      0      1 
+##  31300 455071  72770</code></pre>
+<pre class="r"><code># Número de genes que están por debajo
+# de 1E-5 el p-valor
+length(fit_1[fit_1$p.value &lt; 1e-05, ]$p.value)</code></pre>
+<pre><code>## [1] 10531</code></pre>
+<p>A modo de comparar también se ha evaluado el peso de cada una de las muestras, por si pudiera tener relevancia. Los resultados da un número más alto de significativos, así que nos quedaremos con el ajuste de arriba.</p>
+<pre class="r"><code>## Valores atípicos arrayWeights asigna
+## una puntuación a cada muestra. 1
+## mismo peso, &lt; 1 a la baja y &gt; 1 por
+## arriba
+aw &lt;- arrayWeights(exprs(gse138261), design)
+
+fit &lt;- lmFit(exprs(gse138261), design, weights = aw)
+contrasts &lt;- makeContrasts(AD - Control,
+    levels = design)
+fit2 &lt;- contrasts.fit(fit, contrasts)
+fit2 &lt;- eBayes(fit2)
+table(decideTests(fit2))</code></pre>
+<pre><code>## 
+##     -1      0      1 
+##  57411 403169  98561</code></pre>
+</div>
+<div id="enriquecimiento-funcional" class="section level1">
+<h1>Enriquecimiento funcional</h1>
+<p>El expression set ya estaba anotado, así que después de quedarnos con los 9425 genes que tienen un p-valor menor, hemos seleccionado las siguientes columnas de identificadores:</p>
+<ul>
+<li><p>ID</p></li>
+<li><p>GENE_NAME</p></li>
+<li><p>DESCRIPTION</p></li>
+<li><p>GO_ID</p></li>
+<li><p>ENSEMBL_ID</p></li>
+</ul>
+<p>Lo que pasa es que no todos los genes están anotados, entonces se ha hecho un cribado de aquellos que tienen al menos GENE_SYMBOL. Con estos lo que se ha hecho es añadir el p-valor correspodiente.</p>
+<pre class="r"><code># Se seleccionan los que tenga p-valor
+# &lt; 1E-5
+select_fit &lt;- fit_1[fit_1$p.value &lt; 1e-05,
+    ]$p.value
+
+# Columnas de anotacion seleccionadas
+final &lt;- fData(eset)[rownames(select_fit),
+    c(&quot;ID&quot;, &quot;GENE_NAME&quot;, &quot;GENE_SYMBOL&quot;, &quot;DESCRIPTION&quot;,
+        &quot;GO_ID&quot;, &quot;ENSEMBL_ID&quot;)]
+
+datos &lt;- final[final$GENE_SYMBOL != &quot;&quot;, ]
+# Extraemos p-valor
+p_value &lt;- select_fit[datos$ID, ]
+datos$p_value &lt;- p_value
+# Ordenamos por p-valor
+datos &lt;- datos[order(datos$p_value), ]
+dim(datos)</code></pre>
+<pre><code>## [1] 279   7</code></pre>
 </div>
 
 

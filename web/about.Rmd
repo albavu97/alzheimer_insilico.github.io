@@ -1,5 +1,5 @@
 ---
-title: "Datos del estudio"
+title: "Desarrollo del estudio"
 author: "Alba Vallejo Urruchi"
 subtitle: "Universidad de Valencia"
 ---
@@ -45,6 +45,7 @@ library(GEOquery)
 library(ggplot2)
 library(ggrepel)
 library(dplyr)
+library(reshape2)
 library(pheatmap)
 library(limma)
 ```
@@ -69,10 +70,10 @@ boxplot(exprs(gse138261_raw),outline=FALSE)
 Ahora vamos a ver un mapa de calor, en el que se ve la interacción entre las distintas muestras, contra más cercanas a 0, el valor es menos representativo, es decir, esas muestras tienen menos que ver.
 
 ```{r, eval = doAll, fig.width=8, fig.height=6,warning=FALSE}
+library(dplyr)
 sampleInfo <- pData(gse138261_raw)
-
-sampleInfo <- select(sampleInfo, "age:ch1","disease state:ch1","gender:ch1")
-sampleInfo <- rename(sampleInfo,age = "age:ch1", disease_state="disease state:ch1",gender="gender:ch1")
+sampleInfo <- dplyr::select(sampleInfo, "age:ch1","disease state:ch1","gender:ch1")
+sampleInfo <- dplyr::rename(sampleInfo,age = "age:ch1", disease_state="disease state:ch1",gender="gender:ch1")
 corMatrix <- cor(exprs(gse138261_raw),use="c")
 pheatmap(corMatrix)   
 ```
@@ -90,6 +91,7 @@ pheatmap(corMatrix,
 El último gráfico ha sido un poco de investigación propio y ver cómo se puede hacer, se calcula pca (principal components analysis) y se van a agrupar viendo cómo de separadas están los AD de los control y también de cada muestra se ve la edad del paciente.
 
 ```{r, eval = doAll, fig.width=8, fig.height=6,warning=FALSE}
+library(ggplot2)
 pca <- prcomp(t(exprs(gse138261_raw)))
 
 cbind(sampleInfo, pca$x) %>% 
@@ -108,8 +110,8 @@ exprs(gse138261) = normalizeBetweenArrays(exprs(gse138261_raw))
 # Plot nivel medio de expresión de los grupos Control - AD
 
 ```{r, eval = doAll, fig.width=8, fig.height=6,warning=FALSE}
+library(ggplot2)
 probenames = rownames(gse138261)
-pData(gse138261)
 length(colnames(gse138261))
 sampleId <- c("AD_1","AD_2","AD_3","AD_4","AD_5","AD_6","AD_7","AD_8","AD_9","AD_10","AD_11","AD_12","AD_13","AD_14","AD_15","AD_16","AD_17",
               "control_1", "control_2", "control_3", "control_4", "control_5", "control_6", "control_7", "control_8", "control_9", "control_10",
@@ -119,7 +121,7 @@ colnames(gse138261) <- sampleId
 ## Calculamos los valores medios de expresión para cada genotipo/condición 
 ## sumando las correspondientes columnas y dividiendo por el número de réplicas
 expression.level = exprs(gse138261)
-control = (expression.level[,"control_1"] + expression.level[,"control_1"]+ expression.level[,"control_2"]+ expression.level[,"control_3"]
+control = (expression.level[,"control_1"]+ expression.level[,"control_2"]+ expression.level[,"control_3"]
            + expression.level[,"control_4"]+ expression.level[,"control_5"]+ expression.level[,"control_6"]
            + expression.level[,"control_7"]+ expression.level[,"control_8"]+ expression.level[,"control_9"]
            + expression.level[,"control_10"]+ expression.level[,"control_11"]+ expression.level[,"control_12"]
@@ -147,3 +149,115 @@ colnames(mean.expression) <- conditions.id
 ## global de la comparación entre genotipos/condiciones.
 plot(control,AD,xlab="control",ylab="AD")
 ```
+
+# Expresión diferencial
+
+Uno de los paquetes principales de expresión diferencial es `limma`, que además de verlo en esta asignatura también se usó el cuatrimestre pasado en la asignatura de **Bioinformática estadística**. Para poder hacer este análisi hay que crear un `model.matrix`que es una matriz con el diseño del modelo, es decir, dependiendo de las variables que se quieran tener en cuenta, por cada muestra se pone 0 que significa que la fila (muestra) pertenece al grupo/variable (columna).
+
+En nuestro caso se elaborará un `model.matrix` con casos(AD) y controles para luego aplicar el análisis diferencial.
+
+```{r, eval = doAll, fig.width=8, fig.height=6,warning=FALSE}
+library(limma)
+# Generamos el model.matrix (control vs AD)
+design <- model.matrix(~0+sampleInfo$disease_state)
+design
+
+#Cambiamos el nombre de columnas
+colnames(design) <- c("AD","Control")
+```
+
+Ahora vamos a calcular el nivel medio de expresión de todo el expression set. Con eso veremos que genes están expresados y también eliminaremos aquellos que aparecen en menos de dos muestras. Con ese subconjunto es con el que trabajaremos los contrastes.
+
+```{r, eval = doAll, fig.width=8, fig.height=6,warning=FALSE}
+## Nivel medio de expresión
+cutoff <- median(exprs(gse138261))
+
+## Miramos si está por encima o por debajo del nivel medio de expresión
+is_expressed <- exprs(gse138261) > cutoff
+
+## Nos quedamos con los genes que están en más de 2 muestras
+
+keep <- rowSums(is_expressed) > 2
+
+## En esta tabla se ve cuáles se van a eliminar
+table(keep)
+```
+
+```{r, eval = doAll, fig.width=8, fig.height=6,warning=FALSE}
+## Subconjunto de los elegidos
+gse138261 <- gse138261[keep,]
+
+fit <- lmFit(exprs(gse138261), design)
+head(fit$coefficients)
+```
+Lo que se quiere ver es qué genes están diferencialmente expresados en AD y control y para eso se hace el contraste, ajustamos por Bayes y mostramos los valores ordenados por log Fold Change.
+
+```{r, eval = doAll, fig.width=8, fig.height=6,warning=FALSE}
+#Especificamos un contraste
+contrasts <- makeContrasts(AD - Control, levels=design)
+
+fit_1 <- contrasts.fit(fit, contrasts)
+fit_1 <- eBayes(fit_1)
+
+topTable(fit_1,coef = 1,sort.by="logFC")
+```
+Vamos a usar la función `decideTests` que lo que hace a partir del contraste hecho y los estadísticos obtenido, es decir, 1, expresados, 0 significa que es despreciable y -1 que no se debería tener en cuenta. Porque los valores de ouput vienen a decir: -1 -> significativamente negativo, 0 -> no significativo y 1 -> significativo. 
+
+En nuestro estudio tiene sentido los que son significativos pero quizá haya estudio cuáles sean los genes que tienen una significancia negativa porque quizá pueda tener un significado biológico.
+
+
+```{r, eval = doAll, fig.width=8, fig.height=6,warning=FALSE}
+table(decideTests(fit_1))
+
+# Número de genes que están por debajo de 1E-5 el p-valor
+length(fit_1[fit_1$p.value < 1E-5,]$p.value)
+```
+
+A modo de comparar también se ha evaluado el peso de cada una de las muestras, por si pudiera tener relevancia. Los resultados da un número más alto de significativos, así que nos quedaremos con el ajuste de arriba.
+
+```{r, eval = doAll, fig.width=8, fig.height=6,warning=FALSE}
+## Valores atípicos
+# arrayWeights asigna una puntuación a cada muestra. 1 mismo peso, < 1 a la baja y > 1 por arriba
+aw <- arrayWeights(exprs(gse138261),design)
+
+fit <- lmFit(exprs(gse138261), design,
+             weights = aw)
+contrasts <- makeContrasts(AD - Control, levels=design)
+fit2 <- contrasts.fit(fit, contrasts)
+fit2 <- eBayes(fit2)
+table(decideTests(fit2))
+```
+
+# Enriquecimiento funcional
+
+El expression set ya estaba anotado, así que después de quedarnos con los 9425 genes que tienen un p-valor menor, hemos seleccionado las siguientes columnas de identificadores:
+
+  - ID
+
+  - GENE_NAME
+
+  - DESCRIPTION
+
+  - GO_ID
+
+  - ENSEMBL_ID
+
+Lo que pasa es que no todos los genes están anotados, entonces se ha hecho un cribado de aquellos que tienen al menos GENE_SYMBOL. Con estos lo que se ha hecho es añadir el p-valor correspodiente.
+
+```{r, eval = doAll, fig.width=8, fig.height=6,warning=FALSE}
+#Se seleccionan los que tenga p-valor < 1E-5
+select_fit <- fit_1[fit_1$p.value < 1E-5,]$p.value
+
+#Columnas de anotacion seleccionadas
+final <- fData(eset)[rownames(select_fit),c("ID","GENE_NAME","GENE_SYMBOL","DESCRIPTION","GO_ID","ENSEMBL_ID")]
+
+datos <- final[final$GENE_SYMBOL!= "",]
+#Extraemos p-valor
+p_value <- select_fit[datos$ID,]
+datos$p_value <- p_value
+#Ordenamos por p-valor
+datos <- datos[order(datos$p_value),]
+dim(datos)
+```
+
+

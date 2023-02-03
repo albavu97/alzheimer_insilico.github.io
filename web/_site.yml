@@ -1,12 +1,12 @@
 name: "insilicoAlba"
 navbar:
-  title: "My Website"
+  title: "Insilico final"
   left:
     - text: "Intro"
       href: index.html
-    - text: "Datos"
+    - text: "Desarrollo"
       href: about.html
-    - text: "Análisis"
+    - text: "Resultados"
       href: analisis.html
 output_dir: "site"
 output:
